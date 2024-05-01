@@ -26,7 +26,7 @@ fn get_korte_broek(client: &Client) -> Result<(bool, Vec<String>)> {
         dom.query_selector("body").and_then(|mut b| b.next()).context("Body element not found")?
             .get(parser).and_then(|b| b.as_tag()).context("Could not get body")?
             .attributes().class().context("Could not get class")?.as_utf8_str();
-    let mut verdict = false;
+    let verdict;
     if body_class.contains("ja") {
         verdict = true;
     } else if body_class.contains("nee") {
@@ -46,7 +46,7 @@ fn get_korte_broek(client: &Client) -> Result<(bool, Vec<String>)> {
     Ok((verdict, stats?))
 }
 
-fn send_to_slack(client: &Client, slack_url: &String, verdict: bool, stats: &Vec<String>) -> Result<()> {
+fn send_to_slack(client: &Client, slack_url: &String, verdict: bool, stats: &[String]) -> Result<()> {
     let emoji = if verdict { ":ja_: dat kan!" } else { ":nee_: dat kan niet..." };
     let text = format!(":goeiemorge: *Kan ik vandaag een korte broek aan?*\n{emoji}\n{}", stats.join(", "));
     client.post(slack_url)
